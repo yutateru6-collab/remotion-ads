@@ -1,3 +1,26 @@
+# 日本語ショート動画制作 — remotion-ads fork
+
+**[最初に読む：日本語ガイド](SHORTS_GUIDE_JA.md)**
+
+文字ツッコミ／会話／ゲーム・診断／英語クイズ・解説／アプリ紹介の５つを使い分けるための制作ルールを追加しました。全スキルを混ぜず、主役の型を１つ選びます。
+
+| 入口 | 内容 |
+|---|---|
+| [５種類の作り分け](shorts/MODES.md) | 向いている用途、表示順、使う資料、使わない指示、確認事項 |
+| [共通の検品](shorts/QUALITY.md) | 日本語の改行・読み時間、思考時間、画面の余白、実際の出力確認 |
+| [制作メモの型](shorts/TEMPLATE.md) | 原稿と編集台本を分けて記録し、次の回に再利用 |
+| [旦那ネタの３案](shorts/examples/appeal-husband.md) | 文字・会話・ゲームの台本例。動画の書き出しは未実施 |
+| [出典・採否](shorts/SOURCES.md) | 参照先と、この用途では採用しないルール |
+
+AI作業の入口は [AGENTS.md](AGENTS.md) と [SKILL.md](SKILL.md) です。
+
+ここは制作指示と資料のリポジトリです。５種類の動画生成アプリが完成した、他のスキルをすべて導入した、という意味ではありません。他の公開スキル集は必要な箇所を読むリンク参照です。
+
+ガイドの整合性検査：`python3 scripts/validate_shorts.py`。GitHub Actionsの `Shorts guide checks` はガイドと元資料の保持を検査するもので、動画の完成・動作・内容の保証ではありません。
+
+以下は保持した元のREADMEです。元の広告用フローと日本語ショート動画のルールが異なるときは、依頼内容と選択したモードに合わせて必要な部分だけを使ってください。
+
+<!-- upstream-readme:start -->
 # remotion-ads
 
 A Claude Code skill for creating professional video ads and explainer videos with [Remotion](https://www.remotion.dev/), ElevenLabs voiceover, and animated word-by-word captions.
@@ -61,7 +84,7 @@ This covers colors, fonts, caption styling, voice presets, backgrounds, and comp
 
 ### 2. Create a pronunciation dictionary (optional)
 
-Copy and customize the dictionary template for brand-specific pronunciations:
+Copy and customize the dictionary template:
 
 ```bash
 cp assets/dictionaries/template.pls assets/dictionaries/your-brand.pls
@@ -76,10 +99,10 @@ cp assets/dictionaries/template.pls assets/dictionaries/your-brand.pls
   "character": "narrator",
   "dictionary": "your-brand",
   "scenes": [
-    { "id": "scene1", "text": "Hook text.", "duration": 3.5, "character": "dramatic" },
+    { "id": "scene1", "text": "Hook text.", "duration": 3.5 },
     { "id": "scene2", "text": "Problem.", "duration": 4.5 },
-    { "id": "scene3", "text": "Solution.", "duration": 4.0, "character": "expert" },
-    { "id": "scene4", "text": "CTA.", "duration": 3.0, "character": "calm" }
+    { "id": "scene3", "text": "Solution.", "duration": 4.0 },
+    { "id": "scene4", "text": "CTA.", "duration": 3.0 }
   ]
 }
 ```
@@ -179,7 +202,7 @@ remotion-ads/
 │   ├── formats.md                    # Dimension specs and safe zones
 │   ├── voiceover.md                  # ElevenLabs TTS, timing, dictionaries
 │   ├── captions.md                   # Animated caption styles
-│   ├── animations.md                 # Spring configs and transitions
+│   ├── animations.md                 # Spring configs, transitions
 │   ├── components.md                 # Reusable Remotion components
 │   ├── website-videos.md             # 16:9 long-form format (6 scenes)
 │   ├── url-to-video.md               # URL-to-video workflow
