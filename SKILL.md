@@ -2,6 +2,23 @@
 name: remotion-ads
 description: Professional video ad creation with Remotion — Instagram Reels (9:16), website explainers (16:9), and carousels (4:5). Use when creating video ads, animated social content, or educational explainer videos. Includes ElevenLabs voiceover with word-level captions, AI icon generation, background music, ad copywriting frameworks, and Meta campaign management. Also use when the user provides a URL and wants to create a video for that page.
 ---
+<!-- japanese-short-router:start -->
+## このフォークの入口：日本語ショート動画
+
+ショート動画・日本語の文字動画・会話劇・ゲーム風のネタ・英語教材・アプリ紹介を作る場合は、まず [AGENTS.md](AGENTS.md) と [SHORTS_GUIDE_JA.md](SHORTS_GUIDE_JA.md) を読み、[５つのモード](shorts/MODES.md)から主役を１つ選ぶ。
+
+- `text-tsukkomi`：文章や人物図鑑を文字で面白く読ませる。
+- `chat-story`：会話の返信と間で読ませる。
+- `game-ui`：選択肢や判定画面自体をネタにする。
+- `english-learning`：英語クイズ・文法解説。正確さと思考時間を優先する。
+- `app-promo`：実在アプリの１操作と結果を紹介する。
+
+この用途では、以下の元資料は必要な節だけを参照する。広告の購入誘導、全動画の音声必須化、固定尺、英語向けの文字設定を一律に強制しない。[共通検品](shorts/QUALITY.md)で日本語の読み時間、編集可能な文字レイヤー、実際の書き出しの確認を行う。
+
+他の公開スキル集は[参照表](shorts/SOURCES.md)から必要な部分を読む方式で、今回一括導入していない。取得できないものを使ったと報告しない。下記の元資料と日本語の制作方針が異なる場合は、ユーザーの明示指定と選択モードを優先する。実装APIは公式資料と実行環境で検証する。
+
+以下は保存した元のスキル本文。
+<!-- japanese-short-router:end -->
 
 # Remotion Ads
 
