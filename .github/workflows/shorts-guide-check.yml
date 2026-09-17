@@ -1,0 +1,29 @@
+name: Shorts guide checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guide-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, verified 2026-09-18
+        with:
+          persist-credentials: false
+      - name: Self-test the guide checker
+        run: python3 scripts/validate_shorts.py --self-test
+      - name: Check routes, local links and preserved upstream files
+        run: python3 scripts/validate_shorts.py
+      - name: Clarify scope of this check
+        if: always()
+        run: |
+          echo '## Scope' >> "$GITHUB_STEP_SUMMARY"
+          echo 'These checks validate guide integrity and preservation of upstream text and files.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'They do not render videos or verify readability, English correctness, external URLs, or MP4 quality.' >> "$GITHUB_STEP_SUMMARY"
