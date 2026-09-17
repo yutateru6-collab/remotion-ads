@@ -84,7 +84,7 @@ This covers colors, fonts, caption styling, voice presets, backgrounds, and comp
 
 ### 2. Create a pronunciation dictionary (optional)
 
-Copy and customize the dictionary template:
+Copy and customize the dictionary template for brand-specific pronunciations:
 
 ```bash
 cp assets/dictionaries/template.pls assets/dictionaries/your-brand.pls
@@ -99,10 +99,10 @@ cp assets/dictionaries/template.pls assets/dictionaries/your-brand.pls
   "character": "narrator",
   "dictionary": "your-brand",
   "scenes": [
-    { "id": "scene1", "text": "Hook text.", "duration": 3.5 },
+    { "id": "scene1", "text": "Hook text.", "duration": 3.5, "character": "dramatic" },
     { "id": "scene2", "text": "Problem.", "duration": 4.5 },
-    { "id": "scene3", "text": "Solution.", "duration": 4.0 },
-    { "id": "scene4", "text": "CTA.", "duration": 3.0 }
+    { "id": "scene3", "text": "Solution.", "duration": 4.0, "character": "expert" },
+    { "id": "scene4", "text": "CTA.", "duration": 3.0, "character": "calm" }
   ]
 }
 ```
@@ -202,7 +202,7 @@ remotion-ads/
 │   ├── formats.md                    # Dimension specs and safe zones
 │   ├── voiceover.md                  # ElevenLabs TTS, timing, dictionaries
 │   ├── captions.md                   # Animated caption styles
-│   ├── animations.md                 # Spring configs, transitions
+│   ├── animations.md                 # Spring configs and transitions
 │   ├── components.md                 # Reusable Remotion components
 │   ├── website-videos.md             # 16:9 long-form format (6 scenes)
 │   ├── url-to-video.md               # URL-to-video workflow
