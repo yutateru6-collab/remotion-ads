@@ -5,7 +5,7 @@ description: Professional video ad creation with Remotion — Instagram Reels (9
 <!-- japanese-short-router:start -->
 ## このフォークの入口：日本語ショート動画
 
-**すべての視覚制作で、最初に [Visual Design Master](skills/visual-design-master/SKILL.md) を通す。** ここでアートディレクション、視覚階層、構図、タイポグラフィ、色、モーション、最終Visual QAを決め、その後に内容別の形式を選ぶ。
+**すべての視覚制作で、最初に [Universal Visual Design](universal-design/SKILL.md) を通す。** ここでアートディレクション、視覚階層、構図、タイポグラフィ、色、モーション、最終Visual QAを決め、その後に内容別の形式を選ぶ。
 
 ショート動画・日本語の文字動画・会話劇・ゲーム風のネタ・英語教材・アプリ紹介を作る場合は、[AGENTS.md](AGENTS.md) と [SHORTS_GUIDE_JA.md](SHORTS_GUIDE_JA.md) を読み、[５つのモード](shorts/MODES.md)から主役を１つ選ぶ。
 
