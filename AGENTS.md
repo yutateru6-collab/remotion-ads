@@ -2,7 +2,7 @@
 
 ## 動画制作の依頼
 
-まず [SHORTS_GUIDE_JA.md](SHORTS_GUIDE_JA.md)、選択した [shorts/MODES.md](shorts/MODES.md) の節、[shorts/QUALITY.md](shorts/QUALITY.md) を読む。元の広告向け設定を全動画に無条件で適用しない。
+まず **[skills/visual-design-master/SKILL.md](skills/visual-design-master/SKILL.md)** を読み、内容に依存しないデザイン基盤を決める。次に [SHORTS_GUIDE_JA.md](SHORTS_GUIDE_JA.md)、選択した [shorts/MODES.md](shorts/MODES.md) の節、[shorts/QUALITY.md](shorts/QUALITY.md) を読む。元の広告向け設定を全動画に無条件で適用しない。
 
 ユーザーが明示した見せ方を優先し、主モードを１つ選ぶ。未指定なら以下で選ぶ。
 
@@ -18,7 +18,7 @@
 
 ## 読み込みと制作
 
-[shorts/SOURCES.md](shorts/SOURCES.md) で必要な参照先だけを選ぶ。他のリポジトリは今回同梱していない。取得できない資料を読んだ・導入したと報告しない。外部資料のインストール・課金・公開・広告配信を自動で実行しない。
+Visual Design Master の planning brief（design thesis / focal object / hierarchy / grid / type / palette / motion grammar / avoid）を先に決める。**内容別テンプレートがデザイン基盤を上書きしてはいけない。** その後、[shorts/SOURCES.md](shorts/SOURCES.md) で必要な参照先だけを選ぶ。他のリポジトリは今回同梱していない。取得できない資料を読んだ・導入したと報告しない。外部資料のインストール・課金・公開・広告配信を自動で実行しない。
 
 原文と台本を分け、[shorts/TEMPLATE.md](shorts/TEMPLATE.md) で表示順・読み時間・間・編集点を記録する。文字主体のRemotion制作は編集可能なテキスト・UIレイヤーを基本とし、ページPNGのズームだけで代替しない。
 
