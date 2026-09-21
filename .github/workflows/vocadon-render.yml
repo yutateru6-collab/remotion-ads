@@ -1,0 +1,214 @@
+name: Render VOCADON 20s promo
+on:
+  push:
+    branches: [video/vocadon-tiktok-20260921]
+    paths: [.github/workflows/vocadon-render.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: vocadon-remotion-runtime
+          run-id: 35585716318
+          github-token: ${{ github.token }}
+          path: /tmp/video-runtime
+      - name: Prepare renderer and Japanese fonts
+        run: |
+          mkdir -p video/src video/public video/scripts video/out/stills
+          tar -xzf /tmp/video-runtime/vocadon-runtime.tgz -C video
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          python -m pip install --quiet numpy pillow qrcode
+          fc-cache -f
+      - name: Write the editable Remotion composition
+        run: |
+          cat > video/src/Root.tsx <<'TSX'
+          import React from 'react';
+          import {AbsoluteFill,Composition,Easing,Img,Sequence,interpolate,registerRoot,staticFile,useCurrentFrame} from 'remotion';
+          import {Audio,Video} from '@remotion/media';
+          import demo from '../public/demo.json';
+          const C={paper:'#F8F5EE',ink:'#172431',purple:'#7731CB',muted:'#736C79',rule:'#E6DFEB'};
+          const ease={extrapolateLeft:'clamp' as const,extrapolateRight:'clamp' as const,easing:Easing.bezier(.22,1,.36,1)};
+          const font='"Noto Sans CJK JP", "Noto Sans JP", sans-serif';
+          const camFrames=[0,68,101,156,179,275,310,381,413,455];
+          const Paper=()=> <AbsoluteFill style={{backgroundColor:C.paper}}>
+            <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(${C.rule}66 1px, transparent 1px)`,backgroundSize:'100% 60px',opacity:.54}}/>
+            <div style={{position:'absolute',left:42,top:0,bottom:0,borderLeft:'2px solid #DEC9EA',opacity:.7}}/>
+            <svg width="1080" height="1920" style={{position:'absolute',inset:0}}><path d="M947 178 L966 139 L979 179 L1020 190 L980 204 L965 246 L951 206 L911 191 Z" fill="none" stroke={C.purple} strokeWidth="5" opacity=".22"/><path d="M56 1767 Q124 1714 161 1766 T267 1760" fill="none" stroke={C.purple} strokeWidth="5" opacity=".2"/></svg>
+          </AbsoluteFill>;
+          const Header=({duration,eyebrow,children,first=false}:{duration:number;eyebrow:string;children:React.ReactNode;first?:boolean})=>{
+            const f=useCurrentFrame();
+            return <div data-qa="headline" style={{position:'absolute',left:84,top:250,width:832,color:C.ink,opacity:interpolate(f,first?[duration-7,duration]:[0,7,duration-7,duration],first?[1,0]:[0,1,1,0],ease),translate:`0 ${interpolate(f,[0,13],[first?0:18,0],ease)}px`}}>
+              <div style={{fontSize:31,fontWeight:700,letterSpacing:3,color:C.muted,marginBottom:20}}>{eyebrow}</div>
+              <div style={{fontSize:86,fontWeight:900,lineHeight:1.24,letterSpacing:-2.5}}>{children}</div>
+            </div>;
+          };
+          const Tap=({frame,start,point,scale,cy}:{frame:number;start:number;point:{x:number;y:number};scale:number;cy:number})=>{
+            const f=frame-start;if(f<0||f>24)return null;
+            const x=420+(point.x-196.5)*scale;const y=475+(point.y-cy)*scale;
+            return <div style={{position:'absolute',left:x-34,top:y-34,width:68,height:68,borderRadius:'50%',backgroundColor:'#FFFFFFAA',border:`5px solid ${C.purple}`,opacity:interpolate(f,[0,4,11,24],[0,1,1,0],ease),scale:interpolate(f,[0,8,24],[1.25,.76,2.25],ease),boxShadow:'0 0 0 9px #7731CB22'}}/>;
+          };
+          const Demo=()=>{
+            const f=useCurrentFrame();
+            const cy=interpolate(f,camFrames,[324,324,demo.quickPoint.y,demo.quickPoint.y,282,282,demo.answerFocusY,demo.answerFocusY,282,282],ease);
+            const scale=interpolate(f,camFrames,[1.72,1.72,2.32,2.32,2.34,2.34,2.16,2.16,2.34,2.34],ease);
+            return <div style={{position:'absolute',left:80,top:550,width:840,height:950,overflow:'hidden',borderRadius:34,backgroundColor:C.paper,boxShadow:'0 22px 70px #39244315',opacity:interpolate(f,[0,9,446,455],[1,1,1,0],ease),translate:`0 ${interpolate(f,[446,456],[0,100],ease)}px`,rotate:`${interpolate(f,[0,28],[1.7,0],ease)}deg`}}>
+              <Video src={staticFile('demo.mp4')} muted style={{position:'absolute',maxWidth:'none',width:393*scale,height:852*scale,left:420-196.5*scale,top:475-cy*scale}}/>
+              <Tap frame={f} start={149} point={demo.quickPoint} scale={scale} cy={cy}/>
+              <Tap frame={f} start={278} point={demo.answerPoint} scale={scale} cy={cy}/>
+              <Tap frame={f} start={386} point={demo.nextPoint} scale={scale} cy={cy}/>
+            </div>;
+          };
+          const Outro=()=>{
+            const f=useCurrentFrame();
+            return <AbsoluteFill style={{opacity:interpolate(f,[0,12],[0,1],ease),translate:`0 ${interpolate(f,[0,20],[35,0],ease)}px`}}>
+              <div data-qa="brand" style={{position:'absolute',left:84,top:298,width:830}}>
+                <div style={{fontSize:36,fontWeight:700,color:C.muted,letterSpacing:4,marginBottom:22}}>続く、語彙力を。</div>
+                <div style={{fontFamily:'Arial, sans-serif',fontSize:137,fontWeight:900,letterSpacing:-8,color:C.purple}}>VOCADON</div>
+                <svg width="735" height="22" style={{marginTop:10}}><path d="M3 13 Q341 0 715 10" stroke={C.purple} strokeWidth="9" strokeLinecap="round" fill="none" strokeDasharray="740" strokeDashoffset={interpolate(f,[8,30],[740,0],ease)}/></svg>
+              </div>
+              <Img src={staticFile('dino.webp')} style={{position:'absolute',left:708,top:563,width:184,height:184,objectFit:'contain',rotate:`${interpolate(f,[5,30],[-7,0],ease)}deg`,translate:`0 ${interpolate(f,[0,26],[34,0],ease)}px`}}/>
+              <div data-qa="closing-headline" style={{position:'absolute',left:84,top:794,fontSize:96,lineHeight:1.34,fontWeight:900,letterSpacing:-3}}>今日の英単語、<br/>ここから。</div>
+              <div data-qa="cta" style={{position:'absolute',left:84,top:1160,width:810,height:115,backgroundColor:C.purple,borderRadius:27,color:'white',display:'flex',alignItems:'center',justifyContent:'center',gap:28,fontSize:43,fontWeight:800}}>1分だけ、はじめよう。<svg width="40" height="40" viewBox="0 0 40 40"><path d="M6 20H32M22 10L32 20L22 30" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+              <Img src={staticFile('qr.png')} style={{position:'absolute',left:92,top:1356,width:148,height:148}}/>
+              <div data-qa="url" style={{position:'absolute',left:274,top:1361,width:640,color:C.ink}}><div style={{fontSize:33,fontWeight:800,marginBottom:15}}>スマホのブラウザで体験</div><div style={{fontFamily:'Arial, sans-serif',fontSize:24,fontWeight:600,lineHeight:1.5}}>memorazzz.itisnowornever271.workers.dev</div></div>
+            </AbsoluteFill>;
+          };
+          export const Promo=()=>{
+            const f=useCurrentFrame();
+            return <AbsoluteFill style={{fontFamily:font,color:C.ink}}>
+              <Paper/>
+              <Sequence durationInFrames={456}><Demo/></Sequence>
+              <Sequence from={0} durationInFrames={88}><Header duration={88} eyebrow="英単語、続けたい人へ" first>単語帳、また<br/><span style={{color:C.purple}}>3日</span>で止まった？</Header></Sequence>
+              <Sequence from={88} durationInFrames={81}><Header duration={81} eyebrow="それなら">まずは、<span style={{color:C.purple}}>1分。</span></Header></Sequence>
+              <Sequence from={169} durationInFrames={117}><Header duration={117} eyebrow="クイックトレをタップ">1問ずつ、<br/>サクッと挑戦。</Header></Sequence>
+              <Sequence from={286} durationInFrames={107}><Header duration={107} eyebrow="選んだら、その場で">答えを<span style={{color:C.purple}}>確認。</span></Header></Sequence>
+              <Sequence from={393} durationInFrames={66}><Header duration={66} eyebrow="止まらず、そのまま">次の<span style={{color:C.purple}}>1問</span>へ。</Header></Sequence>
+              <Sequence from={452} durationInFrames={148}><Outro/></Sequence>
+              <div style={{position:'absolute',left:84,top:1674,width:810,height:4,borderRadius:3,backgroundColor:'#DDD4E5',opacity:interpolate(f,[440,472],[1,0],ease)}}><div style={{width:interpolate(f,[0,452],[0,810],{extrapolateRight:'clamp'}),height:4,backgroundColor:C.purple,borderRadius:3}}/></div>
+              <Audio src={staticFile('soundtrack.wav')}/>
+            </AbsoluteFill>;
+          };
+          registerRoot(()=> <Composition id="VOCADON20" component={Promo} width={1080} height={1920} fps={30} durationInFrames={600}/>);
+          TSX
+          cat > video/scripts/capture.mjs <<'JS'
+          import {chromium} from 'playwright';
+          import fs from 'node:fs/promises';import path from 'node:path';import {existsSync} from 'node:fs';import {execFileSync} from 'node:child_process';
+          const target='https://memorazzz.itisnowornever271.workers.dev/';const out=path.resolve('out');const pub=path.resolve('public');const frames=path.join(out,'frames');await fs.mkdir(frames,{recursive:true});
+          const executablePath=['/usr/bin/google-chrome','/opt/google/chrome/chrome'].find(existsSync);
+          const browser=await chromium.launch({executablePath,headless:true,args:['--no-sandbox']});
+          const ctx=await browser.newContext({viewport:{width:393,height:852},deviceScaleFactor:3,isMobile:true,hasTouch:true,locale:'ja-JP',timezoneId:'Asia/Tokyo'});
+          const p=await ctx.newPage();const errors=[];const consoleErrors=[];const events=[];const stages=[];
+          p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});
+          await p.clock.install();await p.goto(target,{waitUntil:'networkidle',timeout:60000});await p.evaluate(()=>document.fonts.ready);
+          const close=p.getByRole('button',{name:'チュートリアルを閉じる',exact:true});if(await close.count())await close.click();await p.waitForTimeout(1000);
+          const dino=await p.evaluate(()=>[...document.images].find(i=>i.currentSrc.includes('VOCADON_dino_01_ui_v2.webp'))?.currentSrc);if(!dino)throw new Error('Original mascot missing');const dr=await ctx.request.get(dino);if(!dr.ok())throw new Error('Mascot retrieval failed');await fs.writeFile(path.join(pub,'dino.webp'),await dr.body());
+          const quick=p.getByRole('button',{name:/1分間クイックトレ/});if(await quick.count()!==1)throw new Error('Verified quick-train button missing');await p.evaluate(()=>scrollTo(0,0));await p.waitForTimeout(500);
+          await p.clock.pauseAt(await p.evaluate(()=>Date.now()+2000));
+          let quickPoint,answerPoint,nextPoint,answerFocusY=465,currentWord='',correctAnswer='';
+          const knownSample={'curious':'[形] 好奇心が強い','gentle':'[形] 優しい、穏やかな','ordinary':'[形] 普通の、ありふれた','brief':'[形] 短い、簡潔な','reliable':'[形] 信頼できる'};
+          const point=async loc=>{const b=await loc.boundingBox();if(!b)throw new Error('Tap target not visible');return {x:b.x+b.width/2,y:b.y+b.height/2};};
+          const snap=async(name,frame)=>{await p.screenshot({path:path.join(out,name+'.png'),scale:'device'});stages.push({name,frame,...await p.evaluate(()=>({text:document.body.innerText,viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},horizontalOverflow:document.documentElement.scrollWidth>document.documentElement.clientWidth,buttons:[...document.querySelectorAll('button')].map(b=>({text:b.innerText,aria:b.getAttribute('aria-label'),disabled:b.disabled,box:{x:b.getBoundingClientRect().x,y:b.getBoundingClientRect().y,width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height}}))}))});};
+          try{
+            await snap('capture-home',0);
+            for(let f=0;f<456;f++){
+              if(f===156){quickPoint=await point(quick);events.push({frame:f,label:'1分間クイックトレ',point:quickPoint});await p.touchscreen.tap(quickPoint.x,quickPoint.y);}
+              if(f===185){await snap('capture-question',f);const text=await p.locator('body').innerText();currentWord=Object.keys(knownSample).find(w=>new RegExp(`\\b${w}\\b`).test(text))||'';if(!currentWord)throw new Error('Native demo question not recognized');correctAnswer=knownSample[currentWord];answerPoint=await point(p.getByRole('button',{name:correctAnswer,exact:true}));}
+              if(f===285){events.push({frame:f,label:correctAnswer,point:answerPoint});await p.touchscreen.tap(answerPoint.x,answerPoint.y);}
+              if(f===317){await snap('capture-answer',f);const next=p.locator('[data-quiz-next-button="true"]');if(await next.count()!==1)throw new Error('Answer did not produce next-question control');nextPoint=await point(next);answerFocusY=Math.max(350,Math.min(610,nextPoint.y-125));}
+              if(f===393){nextPoint=await point(p.locator('[data-quiz-next-button="true"]'));events.push({frame:f,label:'次の問題へ',point:nextPoint});await p.touchscreen.tap(nextPoint.x,nextPoint.y);}
+              if(f===423)await snap('capture-next-question',f);
+              await p.clock.runFor(f%3===0?34:33);await p.screenshot({path:path.join(frames,String(f).padStart(4,'0')+'.jpg'),type:'jpeg',quality:94,scale:'device'});
+              if(f%90===0)console.log('captured',f);
+            }
+            await fs.writeFile(path.join(pub,'demo.json'),JSON.stringify({quickPoint,answerPoint,nextPoint,answerFocusY,currentWord,correctAnswer,events},null,2));
+            execFileSync('ffmpeg',['-y','-loglevel','error','-framerate','30','-i',path.join(frames,'%04d.jpg'),'-c:v','libx264','-preset','fast','-crf','16','-vf','scale=1178:2556','-pix_fmt','yuv420p','-movflags','+faststart',path.join(pub,'demo.mp4')],{stdio:'inherit'});
+          }catch(e){await snap('capture-failure',-1).catch(()=>{});throw e;}
+          finally{await fs.writeFile(path.join(out,'capture-qa.json'),JSON.stringify({target,source:'Unmodified live production app, native sample deck',capture:'Browser-clock-stepped 30fps screenshots at 3x; actual touch events',events,stages,errors,consoleErrors},null,2));await browser.close();}
+          JS
+          cat > video/scripts/render.mjs <<'JS'
+          import {bundle} from '@remotion/bundler';import {selectComposition,renderMedia,renderStill} from '@remotion/renderer';import fs from 'node:fs/promises';import path from 'node:path';import {existsSync} from 'node:fs';
+          const browserExecutable=['/usr/bin/google-chrome','/opt/google/chrome/chrome'].find(existsSync);
+          const serveUrl=await bundle({entryPoint:path.resolve('src/Root.tsx')});const composition=await selectComposition({serveUrl,id:'VOCADON20',browserExecutable});
+          for(const frame of [0,100,180,278,320,420,525,599])await renderStill({serveUrl,composition,frame,output:path.resolve(`out/stills/frame-${frame}.png`),browserExecutable,imageFormat:'png'});
+          await renderMedia({serveUrl,composition,codec:'h264',crf:18,pixelFormat:'yuv420p',audioCodec:'aac',audioBitrate:'192k',outputLocation:path.resolve('out/VOCADON_TikTok_20s.mp4'),browserExecutable,concurrency:2,onProgress:({renderedFrames})=>{if(renderedFrames%90===0)console.log('rendered',renderedFrames);}});
+          await fs.writeFile('out/render-proof.json',JSON.stringify({renderer:'@remotion/renderer',version:'4.0.526',width:composition.width,height:composition.height,fps:composition.fps,frames:composition.durationInFrames,completedAt:new Date().toISOString()},null,2));
+          JS
+          cat > video/scripts/audio.py <<'PY'
+          import numpy as np, wave, subprocess, json, pathlib, qrcode
+          sr=48000; n=sr*20; music=np.zeros((n,2),np.float64); rng=np.random.default_rng(21)
+          def add(t,f,dur=.55,amp=.027,pan=0):
+              j=int(t*sr); k=min(n-j,int(dur*sr))
+              if k<=0:return
+              x=np.arange(k)/sr
+              y=(np.sin(2*np.pi*f*x)+.28*np.sin(2*np.pi*f*2*x)+.08*np.sin(2*np.pi*f*3*x))*np.exp(-x*8)*np.minimum(x/.004,1)*amp
+              music[j:j+k,0]+=y*(1-pan*.35);music[j:j+k,1]+=y*(1+pan*.35)
+          chords=[[60,64,67,71],[57,60,64,67],[53,57,60,64],[55,59,62,67]]
+          for beat in range(34):
+              t=beat*.6; chord=chords[(beat//8)%4]
+              for z in [0,1]:
+                  midi=chord[(beat+z*2)%4]+12;add(t+z*.3,440*2**((midi-69)/12),amp=.023,pan=(-1)**beat*.5)
+              if beat%2==0:add(t,440*2**((chord[0]-24-69)/12),dur=.9,amp=.04)
+          for t in [5.2,9.5,13.1]:add(t,840,.15,.075);add(t+.025,570,.13,.025)
+          add(9.65,1046.5,.65,.045);add(9.80,1318.5,.8,.045)
+          env=np.minimum(np.arange(n)/(sr*.35),1)*np.minimum((n-np.arange(n))/(sr*.85),1);music*=env[:,None]
+          with wave.open('public/music.wav','wb') as w:w.setnchannels(2);w.setsampwidth(2);w.setframerate(sr);w.writeframes((np.clip(music,-1,1)*32767).astype('<i2').tobytes())
+          dur=float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','default=nw=1:nk=1','public/narration.mp3']))
+          tempo=dur/17.8
+          subprocess.run(['ffmpeg','-y','-loglevel','error','-i','public/narration.mp3','-i','public/music.wav','-filter_complex',f'[0:a]atempo={tempo:.8f},loudnorm=I=-17:TP=-2:LRA=8,adelay=250|250,apad=whole_dur=20[v];[1:a]volume=0.85[m];[v][m]amix=inputs=2:duration=longest:normalize=0,alimiter=limit=0.89:level=0,afade=t=out:st=19.25:d=0.75[a]','-map','[a]','-t','20','-ar','48000','-ac','2','public/soundtrack.wav'],check=True)
+          qr=qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M,box_size=12,border=4);qr.add_data('https://memorazzz.itisnowornever271.workers.dev/');qr.make(fit=True);qr.make_image(fill_color='#172431',back_color='#F8F5EE').save('public/qr.png')
+          pathlib.Path('out/audio-proof.json').write_text(json.dumps({'inputVoiceSeconds':dur,'tempoFactor':tempo,'targetVoiceSeconds':17.8,'music':'Original procedural plucked-tone backing, no third-party song','source':'AI Voice Generator clear voice'},indent=2))
+          PY
+          cat > video/README.md <<'MD'
+          # VOCADON 20-second vertical promo
+          Editable Remotion 4.0.526 composition. Main app remains unchanged. Native sample-deck interaction footage is captured from the live production URL, then enlarged to guide attention. No invented growth, score, review or learning-effect claims.
+          
+          Design: warm notebook paper, navy ink and the app's purple accent; real UI is the main object; hold -> tap -> result -> next question -> settled brand ending. 1080x1920, 30fps, 20 seconds. Japanese voice and original synthesized background tones. The native app screenshots are raster footage; added headings, touch markers and end-card typography are editable React layers.
+          
+          Run: `npm install`, then `node scripts/render.mjs`. To recapture, install Chrome, ffmpeg and Japanese CJK fonts, then `node scripts/capture.mjs`. Set `public/narration.mp3` to the supplied voice file and run `python scripts/audio.py` after installing numpy, pillow and qrcode.
+          
+          Fonts are NOT included. Install Noto Sans CJK JP locally. Social-platform UI and physical-iPhone playback require separate review; the video has not been posted to any social platform. The QR points to the actual app URL.
+          MD
+          node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('video/package.json'));p.name='vocadon-promo';p.scripts={studio:'remotion studio src/Root.tsx',render:'node scripts/render.mjs',capture:'node scripts/capture.mjs'};fs.writeFileSync('video/package.json',JSON.stringify(p,null,2));"
+          node --check video/scripts/capture.mjs
+          node --check video/scripts/render.mjs
+      - name: Capture live app through answer and next question
+        working-directory: video
+        run: node scripts/capture.mjs
+      - name: Prepare narration and original audio
+        working-directory: video
+        run: |
+          curl --fail --location --retry 2 --max-time 45 'https://storage.googleapis.com/adm--audio-playback--7d--public/mcp-preview/938ca706-479c-431d-aef9-6747ef77c37b.mp3' -o public/narration.mp3
+          python scripts/audio.py
+      - name: Render with Remotion
+        working-directory: video
+        run: |
+          node scripts/render.mjs
+          ffprobe -v error -show_format -show_streams -of json out/VOCADON_TikTok_20s.mp4 > out/video-metadata.json
+          ffmpeg -v error -i out/VOCADON_TikTok_20s.mp4 -f null -
+          zip -q -r out/VOCADON_Remotion_Source.zip src scripts public package.json package-lock.json README.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: VOCADON-rendered-promo
+          path: |
+            video/out/*.mp4
+            video/out/*.zip
+            video/out/*.json
+            video/out/*.png
+            video/out/stills
+            video/src
+            video/scripts
+            video/public/demo.json
+          retention-days: 3
+          if-no-files-found: error
