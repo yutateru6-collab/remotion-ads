@@ -164,7 +164,7 @@ const HookScene: React.FC<{hook: string}> = ({hook}) => {
         <div style={{height: 24}} />
         <Headline size={88}>{hook}</Headline>
       </div>
-      <PhoneShot src={SHOTS.home} width={570} top={560} scaleTo={1.018} />
+      <PhoneShot src={SHOTS.home} width={570} top={475} scaleTo={1.018} />
       <div
         style={{
           position: 'absolute',
@@ -221,14 +221,14 @@ const CreateScene: React.FC<{topic: string}> = ({topic}) => {
         </div>
       </div>
 
-      <PhoneShot src={SHOTS.create} width={612} top={520} scaleTo={1.02} />
+      <PhoneShot src={SHOTS.create} width={560} top={500} scaleTo={1.02} />
 
       <div
         style={{
           position: 'absolute',
           left: 74,
           right: 74,
-          bottom: 112,
+          bottom: 92,
           fontFamily: '"Noto Sans JP", sans-serif',
           color: COLORS.ink,
           fontSize: 32,
@@ -301,10 +301,10 @@ const ReaderScene: React.FC = () => {
         <Headline size={70}>読むときも、欲しい助けをその場で。</Headline>
       </div>
 
-      <div style={{position: 'absolute', left: 0, right: 0, top: 494}}>
-        <PhoneShot src={current} width={648} top={0} scaleTo={1.012} />
-        <TapPulse x={718} y={112} start={72} />
-        <TapPulse x={788} y={112} start={132} />
+      <div style={{position: 'absolute', left: 0, right: 0, top: 445}}>
+        <PhoneShot src={current} width={584} top={0} scaleTo={1.012} />
+        <TapPulse x={630} y={48} start={72} />
+        <TapPulse x={714} y={48} start={132} />
       </div>
 
       <div
@@ -312,7 +312,7 @@ const ReaderScene: React.FC = () => {
           position: 'absolute',
           left: 108,
           right: 108,
-          bottom: 96,
+          bottom: 104,
           textAlign: 'center',
           color: COLORS.ink,
           fontFamily: '"Noto Sans JP", sans-serif',
