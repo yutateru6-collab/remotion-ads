@@ -164,25 +164,7 @@ const HookScene: React.FC<{hook: string}> = ({hook}) => {
         <div style={{height: 24}} />
         <Headline size={88}>{hook}</Headline>
       </div>
-      <PhoneShot src={SHOTS.home} width={570} top={475} scaleTo={1.018} />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 108,
-          left: 72,
-          right: 72,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          fontFamily: '"Noto Sans JP", sans-serif',
-          color: COLORS.muted,
-          fontSize: 24,
-          fontWeight: 700,
-        }}
-      >
-        <span>好きからつくる、英語長文。</span>
-        <span>20 sec</span>
-      </div>
+      <PhoneShot src={SHOTS.home} width={550} top={520} scaleTo={1.018} />
     </AbsoluteFill>
   );
 };
