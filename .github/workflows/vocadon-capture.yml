@@ -1,0 +1,171 @@
+name: VOCADON real-screen capture
+on:
+  push:
+    branches: [video/vocadon-tiktok-20260921]
+    paths: [.github/workflows/vocadon-capture.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated video dependencies
+        run: |
+          mkdir -p /tmp/vocadon-runtime capture/mirror capture/screens capture/frames
+          cd /tmp/vocadon-runtime
+          npm init -y
+          V=$(npm view remotion version)
+          npm install --save-exact remotion@$V @remotion/cli@$V @remotion/bundler@$V @remotion/renderer@$V @remotion/media@$V react@19.1.0 react-dom@19.1.0 playwright typescript @types/react @types/react-dom
+          if ! command -v google-chrome >/dev/null; then npx playwright install --with-deps chromium; fi
+          cp package.json package-lock.json "$GITHUB_WORKSPACE/capture/"
+      - name: Capture actual deployed app, interactions, and source assets
+        env:
+          TARGET_URL: https://memorazzz.itisnowornever271.workers.dev/
+        run: |
+          cat > /tmp/vocadon-runtime/capture.mjs <<'JS'
+          import fs from 'node:fs/promises';
+          import path from 'node:path';
+          import crypto from 'node:crypto';
+          import {existsSync} from 'node:fs';
+          import {chromium} from 'playwright';
+          const out = path.join(process.env.GITHUB_WORKSPACE, 'capture');
+          const target = process.env.TARGET_URL;
+          const origin = new URL(target).origin;
+          const chrome = ['/usr/bin/google-chrome','/opt/google/chrome/chrome'].find(existsSync);
+          const browser = await chromium.launch({headless:true, ...(chrome ? {executablePath:chrome} : {}), args:['--no-sandbox']});
+          const ctx = await browser.newContext({viewport:{width:393,height:852},deviceScaleFactor:3,isMobile:true,hasTouch:true,locale:'ja-JP',timezoneId:'Asia/Tokyo',userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'});
+          const page = await ctx.newPage();
+          const pending = []; const assets = []; const frames = []; const events = []; const snapshots = [];
+          const consoleErrors = []; const pageErrors = [];
+          page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});
+          page.on('pageerror',e=>pageErrors.push(e.message));
+          page.on('response',r=>{
+            const job=(async()=>{
+              const u=new URL(r.url());
+              if(r.status()!==200 || !['document','stylesheet','script','image','font'].includes(r.request().resourceType()))return;
+              const same=u.origin===origin;
+              const p=same ? (u.pathname==='/'?'index.html':decodeURIComponent(u.pathname).replace(/^\//,'')) : '_external/'+crypto.createHash('sha1').update(r.url()).digest('hex').slice(0,18)+(path.extname(u.pathname)||'.bin');
+              if(p.includes('..'))return;
+              const body=await r.body();
+              await fs.mkdir(path.dirname(path.join(out,'mirror',p)),{recursive:true});
+              await fs.writeFile(path.join(out,'mirror',p),body);
+              assets.push({url:r.url(),path:p,type:r.request().resourceType(),bytes:body.length});
+            })().catch(e=>events.push({type:'asset-warning',message:e.message}));
+            pending.push(job);
+          });
+          let start=0;
+          const mark=(type,extra={})=>events.push({type,epoch:Date.now()/1000,t:start?(Date.now()-start)/1000:0,...extra});
+          const snap=async(name)=>{
+            await page.screenshot({path:path.join(out,'screens',name+'.png'),scale:'device'});
+            await page.screenshot({path:path.join(out,'screens',name+'-preview.jpg'),scale:'css',type:'jpeg',quality:70});
+            const data=await page.evaluate(()=>({title:document.title,url:location.href,text:document.body.innerText,viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},scroll:{width:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth},buttons:[...document.querySelectorAll('button')].filter(e=>e.getBoundingClientRect().height>0).map(e=>({text:e.innerText,aria:e.getAttribute('aria-label'),disabled:e.disabled,box:{x:e.getBoundingClientRect().x,y:e.getBoundingClientRect().y,width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height}})),images:[...document.images].map(e=>({src:e.currentSrc,alt:e.alt,width:e.naturalWidth,height:e.naturalHeight,box:{x:e.getBoundingClientRect().x,y:e.getBoundingClientRect().y,width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height}}))}));
+            snapshots.push({name,...data});
+            await fs.writeFile(path.join(out,name+'.json'),JSON.stringify(data,null,2));
+            mark('snapshot',{name});
+            return data;
+          };
+          const tap=async(label,loc)=>{
+            await loc.scrollIntoViewIfNeeded();
+            await page.waitForTimeout(300);
+            mark('tap',{label,box:await loc.boundingBox()});
+            await loc.tap();
+          };
+          try {
+            await page.goto(target,{waitUntil:'networkidle',timeout:60000});
+            await page.evaluate(()=>document.fonts.ready);
+            await page.waitForTimeout(1800);
+            await snap('00-entry');
+            const close=page.getByRole('button',{name:'チュートリアルを閉じる',exact:true});
+            if(await close.count()) await close.tap();
+            await page.waitForTimeout(1000);
+            await snap('01-home');
+            const cdp=await ctx.newCDPSession(page);
+            let count=0;
+            cdp.on('Page.screencastFrame',e=>{
+              const file=String(count++).padStart(6,'0')+'.jpg';
+              frames.push({file,timestamp:e.metadata.timestamp,metadata:e.metadata});
+              pending.push(fs.writeFile(path.join(out,'frames',file),Buffer.from(e.data,'base64')));
+              cdp.send('Page.screencastFrameAck',{sessionId:e.sessionId}).catch(()=>{});
+            });
+            start=Date.now();
+            await cdp.send('Page.startScreencast',{format:'jpeg',quality:95,maxWidth:1179,maxHeight:2556,everyNthFrame:1});
+            mark('recording-start');
+            await page.waitForTimeout(1800);
+            const quick=page.getByRole('button',{name:/1分間クイックトレ/});
+            if(await quick.count()!==1)throw new Error('Expected exactly one verified quick-train button');
+            await tap('1分間クイックトレ',quick);
+            await page.waitForTimeout(1500);
+            const question=await snap('02-question');
+            await page.waitForTimeout(1800);
+            const choices=question.buttons.filter(b=>!b.disabled&&/^\s*[1-4]\s/.test(b.text));
+            if(choices.length){
+              await tap(choices[0].text,page.getByRole('button',{name:choices[0].text.replace(/\s+/g,' ').trim(),exact:true}));
+              await page.waitForTimeout(900);
+              await snap('03-answer');
+              await page.waitForTimeout(1900);
+              const next=page.locator('[data-quiz-next-button="true"]');
+              if(await next.count()){
+                await tap('次の問題',next);
+                await page.waitForTimeout(1100);
+                await snap('04-next');
+                await page.waitForTimeout(1500);
+              }
+            } else {
+              const reveal=question.buttons.find(b=>!b.disabled && /意味を見る|答えを見る|タップして/.test(b.text));
+              if(reveal){await tap(reveal.text,page.getByRole('button',{name:reveal.text.replace(/\s+/g,' ').trim(),exact:true}));await page.waitForTimeout(1000);await snap('03-answer');await page.waitForTimeout(2000);}
+            }
+            mark('recording-stop');
+            await cdp.send('Page.stopScreencast');
+            await page.screenshot({path:path.join(out,'screens','05-final-full.png'),fullPage:true,scale:'device'});
+            // Save a separate desktop screenshot without touching the user's real browser data.
+            const desktop=await browser.newContext({viewport:{width:1440,height:900},locale:'ja-JP'});
+            const dp=await desktop.newPage();
+            await dp.goto(target,{waitUntil:'networkidle',timeout:60000});
+            const dc=dp.getByRole('button',{name:'チュートリアルを閉じる',exact:true});
+            if(await dc.count())await dc.click();
+            await dp.waitForTimeout(1000);
+            await dp.screenshot({path:path.join(out,'screens','desktop-home.jpg'),type:'jpeg',quality:80});
+            await desktop.close();
+          } catch(e){mark('capture-error',{message:e.stack});await snap('99-error').catch(()=>{});process.exitCode=1;}
+          await page.waitForTimeout(400);
+          await Promise.allSettled(pending);
+          // Mirror only fetched public resources so the exact deployed bundle can be reviewed offline.
+          const external=assets.filter(a=>!a.url.startsWith(origin));
+          for(const a of assets.filter(a=>['document','stylesheet'].includes(a.type))){
+            const file=path.join(out,'mirror',a.path);
+            let text=await fs.readFile(file,'utf8');
+            for(const x of external)text=text.split(x.url).join('/'+x.path);
+            await fs.writeFile(file,text);
+          }
+          await fs.writeFile(path.join(out,'frames.json'),JSON.stringify(frames,null,2));
+          await fs.writeFile(path.join(out,'events.json'),JSON.stringify(events,null,2));
+          await fs.writeFile(path.join(out,'assets.json'),JSON.stringify(assets,null,2));
+          await fs.writeFile(path.join(out,'qa.json'),JSON.stringify({target,generatedAt:new Date().toISOString(),sourceRepository:'yutateru6-collab/memorazzz',workflowRepository:process.env.GITHUB_REPOSITORY,workflowSha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,consoleErrors,pageErrors,events,snapshots},null,2));
+          await browser.close();
+          JS
+          node /tmp/vocadon-runtime/capture.mjs
+      - name: Pack source guide and runtime
+        if: always()
+        run: |
+          tar -czf capture/remotion-guide-source.tgz --exclude=.git --exclude=capture --exclude=node_modules .
+          cd /tmp/vocadon-runtime
+          tar -czf "$GITHUB_WORKSPACE/vocadon-runtime.tgz" node_modules package.json package-lock.json capture.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vocadon-real-screen-capture
+          path: capture
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vocadon-remotion-runtime
+          path: vocadon-runtime.tgz
+          compression-level: 0
+          retention-days: 1
