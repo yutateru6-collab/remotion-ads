@@ -4,7 +4,7 @@ import {ReadonPromo, type ReadonPromoProps} from './ReadonPromo';
 
 export const RemotionRoot: React.FC = () => {
   return (
-    <Composition<ReadonPromoProps>
+    <Composition
       id="ReadonPromo"
       component={ReadonPromo}
       durationInFrames={600}
