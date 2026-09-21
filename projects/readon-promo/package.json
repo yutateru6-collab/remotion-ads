@@ -1,0 +1,30 @@
+{
+  "name": "readon-promo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "capture": "node scripts/capture.mjs",
+    "typecheck": "tsc --noEmit",
+    "render": "remotion render src/index.ts ReadonPromo out/readon-promo.mp4 --codec=h264 --crf=18",
+    "still:hook": "remotion still src/index.ts ReadonPromo out/qa-hook.png --frame=45 --scale=0.5",
+    "still:create": "remotion still src/index.ts ReadonPromo out/qa-create.png --frame=165 --scale=0.5",
+    "still:reader": "remotion still src/index.ts ReadonPromo out/qa-reader.png --frame=315 --scale=0.5",
+    "still:explain": "remotion still src/index.ts ReadonPromo out/qa-explain.png --frame=435 --scale=0.5",
+    "still:outro": "remotion still src/index.ts ReadonPromo out/qa-outro.png --frame=555 --scale=0.5",
+    "stills": "npm run still:hook && npm run still:create && npm run still:reader && npm run still:explain && npm run still:outro"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.506",
+    "playwright": "1.55.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.506"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "5.8.2"
+  }
+}

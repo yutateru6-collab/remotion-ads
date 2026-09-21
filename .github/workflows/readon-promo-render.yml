@@ -1,0 +1,75 @@
+name: Render READON promo
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "projects/readon-promo/**"
+      - ".github/workflows/readon-promo-render.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/readon-promo
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+
+      - name: Install project dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare output folders
+        run: mkdir -p out public/screens
+
+      - name: Capture READON production UI
+        run: npm run capture
+        env:
+          READON_URL: https://memora-sentences.itisnowornever271.workers.dev
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Render QA stills
+        run: npm run stills
+
+      - name: Render MP4
+        run: npm run render
+
+      - name: Inspect rendered media
+        run: |
+          ffprobe -v error \
+            -show_entries format=duration:stream=index,codec_name,codec_type,width,height,r_frame_rate \
+            -of json out/readon-promo.mp4 > out/ffprobe.json
+          cat out/ffprobe.json
+
+      - name: Upload READON promo artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: readon-promo
+          path: |
+            projects/readon-promo/out/
+            projects/readon-promo/public/screens/
+          if-no-files-found: error
+          retention-days: 14
