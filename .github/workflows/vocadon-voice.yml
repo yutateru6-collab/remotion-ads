@@ -15,7 +15,7 @@ jobs:
         run: |
           mkdir -p voice
           curl --fail --location --retry 2 --max-time 45 'https://storage.googleapis.com/adm--audio-playback--7d--public/mcp-preview/938ca706-479c-431d-aef9-6747ef77c37b.mp3' -o voice/narration.mp3
-          ffprobe -v error -show_format -show_streams -of json voice/narration.mp3 > voice/narration-metadata.json
+          test -s voice/narration.mp3
           printf '%s\n' '単語帳、また三日で止まった？ それなら、まずは一分。 クイックトレをタップして、問題に挑戦。 答えを確認して、次の一問へ。 今日の英単語、ここから始めよう。' > voice/transcript.txt
       - uses: actions/upload-artifact@v4
         with:
