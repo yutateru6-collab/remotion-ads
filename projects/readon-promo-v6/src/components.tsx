@@ -18,7 +18,7 @@ export const RetentionBar: React.FC = () => {
       backgroundColor:'rgba(23,32,40,0.08)', zIndex:100
     }}>
       <div style={{
-        width: interpolate(frame,[0,500],[0,1080],{
+        width: interpolate(frame,[0,515],[0,1080],{
           extrapolateLeft:'clamp', extrapolateRight:'clamp'
         }),
         height:'100%',
