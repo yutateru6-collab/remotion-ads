@@ -66,17 +66,6 @@ export const HookScene: React.FC = () => {
         </Headline>
       </div>
 
-      <div
-        style={{
-          position: 'absolute',
-          left: SAFE.left,
-          top: 650,
-          opacity: interpolate(frame, [30, 50], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}),
-        }}
-      >
-        <Supporting size={50}>題材を、自分の「好き」に変える。</Supporting>
-      </div>
-
       <Device
         src={SHOTS.home}
         width={520}
@@ -250,10 +239,6 @@ export const MaterialScene: React.FC = () => {
           </div>
         );
       })}
-
-      <div style={{position: 'absolute', left: SAFE.left, right: SAFE.right, top: 1460, textAlign: 'center'}}>
-        <Supporting size={52} align="center">選んだ条件が、そのまま読む理由になる。</Supporting>
-      </div>
 
       <FilmGrain opacity={0.04} />
       <Vignette strength={0.88} />
