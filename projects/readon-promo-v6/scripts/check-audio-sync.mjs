@@ -5,16 +5,16 @@ import {execFileSync} from 'node:child_process';
 const fps=30;
 const toleranceFrames=3;
 const slots=[
-  ['vo-hook.mp3',0,54],
-  ['vo-quiz.mp3',54,90],
-  ['vo-answer.mp3',90,132],
-  ['vo-bridge.mp3',132,198],
-  ['vo-app.mp3',198,252],
-  ['vo-read.mp3',252,279],
-  ['vo-translate.mp3',279,327],
-  ['vo-explain.mp3',327,381],
-  ['vo-payoff.mp3',381,438],
-  ['vo-close.mp3',438,501],
+  ['vo-hook.mp3',0,48],
+  ['vo-quiz.mp3',48,84],
+  ['vo-answer.mp3',84,132],
+  ['vo-bridge.mp3',132,192],
+  ['vo-app.mp3',192,246],
+  ['vo-read.mp3',246,273],
+  ['vo-translate.mp3',273,321],
+  ['vo-explain.mp3',321,387],
+  ['vo-payoff.mp3',387,432],
+  ['vo-close.mp3',432,516],
 ];
 
 const results=[];
