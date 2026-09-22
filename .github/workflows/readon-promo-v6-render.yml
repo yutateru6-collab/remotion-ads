@@ -1,0 +1,110 @@
+name: Render READON promo V6
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "projects/readon-promo-v6/**"
+      - "skills/readon-promo-director/**"
+      - ".github/workflows/readon-promo-v6-render.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: projects/readon-promo-v6
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare folders
+        run: mkdir -p out public/screens public/audio
+
+      - name: Capture production UI
+        run: npm run capture
+        env:
+          READON_URL: https://memora-sentences.itisnowornever271.workers.dev
+
+      - name: Fetch AI voice
+        run: npm run fetch:voice
+
+      - name: Generate BGM and SFX
+        run: npm run generate:sfx
+
+      - name: Verify Japanese fonts
+        run: |
+          test -d node_modules/@fontsource/zen-kaku-gothic-new
+          test -d node_modules/@fontsource/biz-udpgothic
+
+      - name: Validate audio sync slots
+        run: npm run audio:sync
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Render QA stills
+        run: npm run stills
+
+      - name: Render raw MP4
+        run: npm run render:raw
+
+      - name: Normalize audio
+        run: |
+          ffmpeg -y \
+            -i out/readon-promo-v6-raw.mp4 \
+            -c:v copy \
+            -af "loudnorm=I=-16:TP=-1.5:LRA=8" \
+            -c:a aac -b:a 192k \
+            out/readon-promo-v6.mp4
+
+      - name: Inspect final media and loudness
+        run: |
+          ffprobe -v error \
+            -show_entries format=duration:stream=index,codec_name,codec_type,width,height,r_frame_rate \
+            -of json out/readon-promo-v6.mp4 > out/ffprobe.json
+          ffmpeg -i out/readon-promo-v6.mp4 -filter_complex ebur128=peak=true -f null - \
+            2> out/loudness.txt || true
+          cat out/ffprobe.json
+          tail -40 out/loudness.txt
+
+      - name: Build 1-second contact sheet
+        run: |
+          ffmpeg -y \
+            -i out/readon-promo-v6.mp4 \
+            -vf "fps=1,scale=270:480,tile=4x5" \
+            -frames:v 1 \
+            out/contact-sheet.jpg
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: readon-promo-v6
+          path: |
+            projects/readon-promo-v6/out/
+            projects/readon-promo-v6/public/screens/
+          if-no-files-found: error
+          retention-days: 14
