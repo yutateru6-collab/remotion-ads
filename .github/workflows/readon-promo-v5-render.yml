@@ -95,7 +95,7 @@ jobs:
         run: |
           ffmpeg -y \
             -i out/readon-promo-v5.mp4 \
-            -vf "fps=1,scale=270:480,tile=5x3" \
+            -vf "fps=1,scale=270:480,tile=4x4" \
             -frames:v 1 \
             out/contact-sheet.jpg
 
