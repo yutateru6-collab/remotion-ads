@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
-import {BrandBug, Device, FilmGrain, Headline, Supporting, TapPulse, Vignette} from './components';
-import {C, DISPLAY_FONT, SAFE, SHOTS, UI_FONT} from './style';
+import {BrandBug, Device, FilmGrain, Headline, TapPulse, Vignette} from './components';
+import {C, SAFE, SHOTS, UI_FONT} from './style';
 
 export const ReaderScene: React.FC<{
   src: string;
@@ -12,14 +12,6 @@ export const ReaderScene: React.FC<{
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const p = spring({frame, fps, config: {damping: 18, stiffness: 128, mass: 0.7}});
-  const accent = mode === 'translate' ? C.cyan : mode === 'explain' ? C.gold : C.coral;
-  const label = mode === 'translate' ? '訳' : mode === 'explain' ? '解説' : 'READ';
-  const sub = mode === 'translate'
-    ? '分からない瞬間だけ、見る。'
-    : mode === 'explain'
-      ? 'もっと知りたいところだけ、深く。'
-      : 'まずは、自分で読む。';
-
   return (
     <AbsoluteFill style={{background: 'radial-gradient(circle at 46% 50%, rgba(102,227,241,0.12), transparent 38%), ' + C.bg, overflow: 'hidden'}}>
       <BrandBug muted />
@@ -40,34 +32,6 @@ export const ReaderScene: React.FC<{
       />
 
       {tap ? <TapPulse x={tap.x} y={tap.y} at={tap.at} /> : null}
-
-      <div
-        style={{
-          position: 'absolute',
-          left: SAFE.left,
-          right: SAFE.right,
-          top: 1500,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 18,
-        }}
-      >
-        <div
-          style={{
-            flex: '0 0 auto',
-            padding: '13px 20px',
-            borderRadius: 999,
-            backgroundColor: accent,
-            color: C.bg,
-            fontFamily: UI_FONT,
-            fontSize: 40,
-            fontWeight: 700,
-          }}
-        >
-          {label}
-        </div>
-        <Supporting size={50}>{sub}</Supporting>
-      </div>
 
       <FilmGrain />
       <Vignette />
@@ -172,21 +136,6 @@ export const OutroScene: React.FC<{cta: string}> = ({cta}) => {
         >
           READONを開く
         </div>
-      </div>
-
-      <div
-        style={{
-          position: 'absolute',
-          left: SAFE.left,
-          right: SAFE.right,
-          bottom: 160,
-          fontFamily: UI_FONT,
-          fontSize: 28,
-          fontWeight: 700,
-          color: C.muted,
-        }}
-      >
-        memora-sentences.itisnowornever271.workers.dev
       </div>
 
       <FilmGrain opacity={0.025} />
