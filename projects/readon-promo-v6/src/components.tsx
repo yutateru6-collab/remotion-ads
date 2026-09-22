@@ -141,31 +141,55 @@ export const HandThumb: React.FC<{
   const {fps}=useVideoConfig();
   const p=spring({frame:frame-delay,fps,config:{damping:20,stiffness:150,mass:0.72}});
   const tapOffset=tap&&frame>delay+10&&frame<delay+22
-    ? interpolate(frame,[delay+10,delay+16,delay+22],[0,-24,0]):0;
+    ? interpolate(frame,[delay+10,delay+16,delay+22],[0,-20,0]):0;
+  const skin='linear-gradient(160deg,#F0C6A8 0%,#DFA47C 60%,#C9825E 100%)';
 
   return (
     <div style={{
-      position:'absolute',left:x,top:y,width:340,height:520,rotate:rotate+'deg',
+      position:'absolute',left:x,top:y,width:330,height:520,rotate:rotate+'deg',
       opacity:p,
-      translate:interpolate(p,[0,1],[120,0])+'px '+
-        (interpolate(p,[0,1],[120,0])+tapOffset)+'px',
-      zIndex:12,pointerEvents:'none'
+      translate:interpolate(p,[0,1],[115,0])+'px '+
+        (interpolate(p,[0,1],[110,0])+tapOffset)+'px',
+      zIndex:12,pointerEvents:'none',
+      filter:'drop-shadow(0 18px 20px rgba(76,49,32,0.12))'
     }}>
       <div style={{
-        position:'absolute',left:78,top:110,width:205,height:390,
-        borderRadius:'48% 46% 50% 52%',
-        background:'linear-gradient(160deg,#E9BB98 0%,#DFA47C 58%,#CC8D68 100%)',
-        boxShadow:'0 22px 45px rgba(76,49,32,0.20)'
+        position:'absolute',left:130,top:190,width:160,height:285,
+        borderRadius:'46% 48% 52% 50%',background:skin
       }}/>
       <div style={{
-        position:'absolute',left:8,top:54,width:110,height:280,borderRadius:999,
-        background:'linear-gradient(160deg,#EDC3A2 0%,#DFA47C 64%,#CC8D68 100%)',
-        rotate:'-26deg',transformOrigin:'85% 90%',
-        boxShadow:'0 16px 34px rgba(76,49,32,0.16)'
+        position:'absolute',left:34,top:58,width:82,height:260,borderRadius:999,
+        background:skin,rotate:'-28deg',transformOrigin:'80% 92%'
+      }}>
+        <div style={{
+          position:'absolute',left:18,top:18,width:46,height:28,borderRadius:'50%',
+          backgroundColor:'#F8D9C6',opacity:0.92
+        }}/>
+      </div>
+      <div style={{
+        position:'absolute',left:115,top:94,width:76,height:224,borderRadius:999,
+        background:skin,rotate:'-9deg',transformOrigin:'55% 94%'
+      }}>
+        <div style={{
+          position:'absolute',left:16,top:16,width:43,height:25,borderRadius:'50%',
+          backgroundColor:'#F7D7C4',opacity:0.90
+        }}/>
+      </div>
+      <div style={{
+        position:'absolute',left:184,top:126,width:68,height:185,borderRadius:999,
+        background:skin,rotate:'8deg',transformOrigin:'45% 94%'
       }}/>
       <div style={{
-        position:'absolute',left:38,top:62,width:64,height:92,
-        borderRadius:'60% 60% 48% 48%',backgroundColor:'#F0C5A4',rotate:'-26deg'
+        position:'absolute',left:82,top:245,width:158,height:76,borderRadius:999,
+        background:skin,rotate:'-38deg',transformOrigin:'88% 50%'
+      }}/>
+      <div style={{
+        position:'absolute',left:146,top:268,width:88,height:2,
+        backgroundColor:'rgba(130,76,50,0.20)',rotate:'-4deg'
+      }}/>
+      <div style={{
+        position:'absolute',left:152,top:310,width:78,height:2,
+        backgroundColor:'rgba(130,76,50,0.16)',rotate:'5deg'
       }}/>
     </div>
   );
