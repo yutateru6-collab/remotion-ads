@@ -109,11 +109,11 @@ export const AnswerScene: React.FC = () => {
 
 export const BridgeScene: React.FC = () => (
   <AbsoluteFill>
-    <DeskBackdrop darken={0.10}/>
+    <DeskBackdrop />
     <div style={{position:'absolute',left:60,top:330,zIndex:20}}>
-      <HeadlineLines lines={['好きな話なら、','続きが気になる。']} size={90} color={C.white}/>
+      <HeadlineLines lines={['好きな話なら、','続きが気になる。']} size={90}/>
       <div style={{height:28}}/>
-      <SmallText size={46} color={C.white}>その「好き」を、そのまま英語長文に。</SmallText>
+      <SmallText size={46} color={C.ink}>その「好き」を、そのまま英語長文に。</SmallText>
     </div>
     <PhoneOnDesk src={SHOTS.home} top={900} left={330} width={620} rotate={4}/>
     <HandThumb x={720} y={1280} rotate={-18} delay={5}/>
@@ -195,11 +195,11 @@ export const ReaderScene: React.FC<{
 
 export const PayoffScene: React.FC = () => (
   <AbsoluteFill>
-    <DeskBackdrop darken={0.06}/>
+    <DeskBackdrop />
     <div style={{position:'absolute',left:60,top:420,zIndex:20}}>
-      <HeadlineLines lines={['好きな話だから、','読みたくなる。']} size={92} color={C.white}/>
+      <HeadlineLines lines={['好きな話だから、','読みたくなる。']} size={92}/>
       <div style={{height:26}}/>
-      <SmallText size={46} color={C.white}>英語を「興味ある話」に変える。</SmallText>
+      <SmallText size={46} color={C.ink}>英語を「興味ある話」に変える。</SmallText>
     </div>
     <PhoneOnDesk src={SHOTS.explanation} top={930} left={340} width={600} rotate={4}/>
   </AbsoluteFill>
