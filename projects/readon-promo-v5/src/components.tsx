@@ -131,7 +131,7 @@ export const RetentionBar: React.FC = () => {
     >
       <div
         style={{
-          width: interpolate(frame, [0, 449], [0, 1080], {
+          width: interpolate(frame, [0, 467], [0, 1080], {
             extrapolateLeft: 'clamp',
             extrapolateRight: 'clamp',
           }),
