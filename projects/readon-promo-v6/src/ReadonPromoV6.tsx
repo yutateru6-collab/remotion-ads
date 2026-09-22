@@ -18,34 +18,34 @@ export const ReadonPromoV6: React.FC = () => (
   <AbsoluteFill style={{backgroundColor:C.paper}}>
     <Soundtrack />
 
-    <Sequence from={0} durationInFrames={54}>
+    <Sequence from={0} durationInFrames={48}>
       <HookScene />
     </Sequence>
-    <Sequence from={54} durationInFrames={36}>
+    <Sequence from={48} durationInFrames={36}>
       <QuizScene />
     </Sequence>
-    <Sequence from={90} durationInFrames={42}>
+    <Sequence from={84} durationInFrames={48}>
       <AnswerScene />
     </Sequence>
-    <Sequence from={132} durationInFrames={66}>
+    <Sequence from={132} durationInFrames={60}>
       <BridgeScene />
     </Sequence>
-    <Sequence from={198} durationInFrames={54}>
+    <Sequence from={192} durationInFrames={54}>
       <AppScene />
     </Sequence>
-    <Sequence from={252} durationInFrames={27}>
+    <Sequence from={246} durationInFrames={27}>
       <ReaderScene src={SHOTS.english} mode="read" />
     </Sequence>
-    <Sequence from={279} durationInFrames={48}>
+    <Sequence from={273} durationInFrames={48}>
       <ReaderScene src={SHOTS.translation} mode="translate" />
     </Sequence>
-    <Sequence from={327} durationInFrames={54}>
+    <Sequence from={321} durationInFrames={66}>
       <ReaderScene src={SHOTS.explanation} mode="explain" />
     </Sequence>
-    <Sequence from={381} durationInFrames={57}>
+    <Sequence from={387} durationInFrames={45}>
       <PayoffScene />
     </Sequence>
-    <Sequence from={438} durationInFrames={63}>
+    <Sequence from={432} durationInFrames={84}>
       <CloseScene />
     </Sequence>
 
