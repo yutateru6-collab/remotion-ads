@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
-import {BrandBug, Device, FilmGrain, Headline, TapPulse, Vignette} from './components';
+import {BrandBug, Device, FilmGrain, Headline, Supporting, TapPulse, Vignette} from './components';
 import {C, SAFE, SHOTS, UI_FONT} from './style';
 
 export const ReaderScene: React.FC<{
