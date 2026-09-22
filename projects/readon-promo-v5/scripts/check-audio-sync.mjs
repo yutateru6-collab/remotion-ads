@@ -6,15 +6,15 @@ const fps = 30;
 const toleranceFrames = 3;
 
 const slots = [
-  ['vo-hook.mp3', 0, 45],
-  ['vo-quiz.mp3', 45, 90],
-  ['vo-answer.mp3', 90, 126],
-  ['vo-interest.mp3', 126, 180],
-  ['vo-topic.mp3', 180, 240],
-  ['vo-read.mp3', 240, 285],
-  ['vo-translate.mp3', 285, 330],
-  ['vo-explain.mp3', 330, 375],
-  ['vo-close.mp3', 375, 450],
+  ['vo-hook.mp3', 0, 48],
+  ['vo-quiz.mp3', 48, 84],
+  ['vo-answer.mp3', 84, 132],
+  ['vo-interest.mp3', 132, 192],
+  ['vo-topic.mp3', 192, 252],
+  ['vo-read.mp3', 252, 282],
+  ['vo-translate.mp3', 282, 330],
+  ['vo-explain.mp3', 330, 384],
+  ['vo-close.mp3', 384, 468],
 ];
 
 const results = [];
