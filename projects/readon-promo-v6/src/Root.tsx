@@ -6,7 +6,7 @@ export const RemotionRoot: React.FC = () => (
   <Composition
     id="ReadonPromoV6"
     component={ReadonPromoV6}
-    durationInFrames={501}
+    durationInFrames={516}
     fps={30}
     width={1080}
     height={1920}
